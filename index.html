@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>bcnode.io — COSIGO™ Bitcoin Verification Node</title>
+
+  <meta name="description"
+    content="bcnode.io is an independent Bitcoin verification node operated as part of COSIGO™ infrastructure. Public read-only node telemetry and explorer access are available." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://bcnode.io/" />
+
+  <meta property="og:title" content="bcnode.io — COSIGO™ Bitcoin Verification Node" />
+  <meta property="og:description" content="Independent Bitcoin verification infrastructure supporting COSIGO™." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://bcnode.io/" />
+  <meta property="og:site_name" content="COSIGO" />
+  <meta name="author" content="COSIGO Infrastructure" />
+
+  <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "bcnode.io",
+        "description": "Independent Bitcoin verification infrastructure operated as part of COSIGO.",
+        "url": "https://bcnode.io/"
+      }
+    </script>
+
+  <style>
+    :root {
+      --bg: #0a0d12;
+      --panel: #121720;
+      --line: rgba(255, 255, 255, 0.1);
+      --ink: #edf2ff;
+      --muted: #a9b4c8;
+      --gold: #d4af37;
+      --gold-soft: rgba(212, 175, 55, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(900px 500px at 20% 0%,
+          rgba(212, 175, 55, 0.05),
+          transparent 60%),
+        linear-gradient(180deg, #07090d, #0d121a);
+      color: var(--ink);
+      font:
+        16px/1.5 Georgia,
+        "Times New Roman",
+        serif;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(920px, 100%);
+      background: rgba(18, 23, 32, 0.86);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 34px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(34px, 5vw, 58px);
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+
+    .accent {
+      color: var(--gold);
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    strong {
+      color: var(--ink);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(212, 175, 55, 0.32);
+      background: rgba(212, 175, 55, 0.08);
+      color: #fff1bf;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      animation: pulseGlow 2.2s ease-in-out infinite;
+      margin: 8px 0 20px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+    }
+
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+      }
+
+      50% {
+        box-shadow: 0 0 18px rgba(212, 175, 55, 0.18);
+      }
+    }
+
+    .hero-actions,
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-actions {
+      margin: 18px 0 10px;
+    }
+
+    .links {
+      margin-top: 16px;
+      margin-bottom: 10px;
+    }
+
+    .links a,
+    .hero-actions a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--ink);
+      text-decoration: none;
+      transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
+    }
+
+    .hero-actions a:hover,
+    .links a:hover {
+      transform: translateY(-2px);
+      border-color: rgba(212, 175, 55, 0.45);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.24),
+        0 0 12px rgba(212, 175, 55, 0.12);
+    }
+
+    .hero-actions .primary {
+      background: rgba(212, 175, 55, 0.12);
+      border-color: rgba(212, 175, 55, 0.38);
+      color: #fff3c2;
+    }
+
+    .meta-grid {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .meta-card {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 14px 16px;
+    }
+
+    .meta-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 6px;
+    }
+
+    .meta-value {
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .support-block {
+      margin-top: 26px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .address-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 12px 0 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .address-link {
+      text-decoration: none;
+      flex: 1 1 560px;
+      min-width: 0;
+    }
+
+    .address-link code {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
+      word-break: break-all;
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--gold);
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    .copy-btn {
+      padding: 9px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      border-color: rgba(212, 175, 55, 0.45);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .copy-btn.copied {
+      background: rgba(212, 175, 55, 0.18);
+      border-color: rgba(212, 175, 55, 0.55);
+      color: #fff3c2;
+    }
+
+    .small-note {
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .footnote {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 24px;
+      }
+
+      p {
+        font-size: 17px;
+      }
+
+      .meta-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <!-- CIGO trade link metadata -->
+  <meta name="description" content="bcnode.io is an independent Bitcoin verification node operated as part of COSIGO infrastructure, with public explorer access and links to COSIGO and CIGO resources.">
+  <meta property="og:title" content="bcnode.io — COSIGO Bitcoin Verification Node">
+  <meta property="og:description" content="Independent Bitcoin verification infrastructure with public explorer access and COSIGO/CIGO resource links.">
+  <meta property="og:image" content="https://bcnode.io/assets/cigo_256.png">
+  <meta name="twitter:image" content="https://bcnode.io/assets/cigo_256.png">
+  <link rel="icon" type="image/png" href="/assets/cigo_256.png">
+  <link rel="apple-touch-icon" href="/assets/cigo_256.png">
+
+
+  <style>
+    .cigo-trade-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .cigo-trade-tab img {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.45);
+    }
+
+    .cigo-trade-note {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      background:
+        linear-gradient(135deg, rgba(20, 12, 5, 0.92), rgba(54, 32, 13, 0.72), rgba(10, 10, 10, 0.92));
+      color: #eadfca;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 244, 214, 0.05),
+        0 0 24px rgba(184, 115, 51, 0.13);
+    }
+
+    .cigo-trade-note strong {
+      color: #facc15;
+    }
+
+    .cigo-trade-note a {
+      color: #fde68a;
+      font-weight: 800;
+      text-decoration: none;
+    }
+  </style>
+
+
+  <style>
+    .cigo-trade-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+    }
+
+    .cigo-trade-note .cigo-note-icon {
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: radial-gradient(circle at 35% 28%, rgba(255,244,214,.98), rgba(245,158,11,.72), rgba(45,20,4,.96));
+      border: 1px solid rgba(255,236,179,.72);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.18) inset,
+        0 0 18px rgba(245,158,11,.46),
+        0 8px 18px rgba(0,0,0,.30);
+    }
+
+    .cigo-trade-note .cigo-note-copy {
+      margin: 0;
+      min-width: 0;
+    }
+
+    @media (max-width: 560px) {
+      .cigo-trade-note {
+        gap: 10px;
+      }
+
+      .cigo-trade-note .cigo-note-icon {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+  <main class="card">
+    <h1><span class="accent">bcnode.io&trade;</span></h1>
+
+    <p>
+      Independent Bitcoin verification node operated as part of
+      COSIGO&trade; infrastructure.
+    </p>
+
+    <p>
+      This system validates Bitcoin independently and provides public read-only node telemetry and explorer access.
+    </p>
+<div class="status-badge">
+      <span class="status-dot"></span>
+      <span id="sync-badge">Online</span>
+    </div>
+
+    <div class="hero-actions">
+      <a class="primary" href="https://explorer.bcnode.io/">Open Bitcoin Explorer</a>
+      <a href="https://node.cosigo.io/">Node documentation</a>
+      <a href="https://token.cosigo.io/">COSIGO smart contract</a>
+    </div>
+
+    <section class="meta-grid">
+      <div class="meta-card">
+        <div class="meta-label">Network</div>
+        <div class="meta-value" id="chain">Bitcoin mainnet</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Mode</div>
+        <div class="meta-value" id="pruned">Pruned node</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Status</div>
+        <div class="meta-value" id="status-text">Online</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Role</div>
+        <div class="meta-value">Verification infrastructure</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Blocks</div>
+        <div class="meta-value" id="blocks">—</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Headers</div>
+        <div class="meta-value" id="headers">—</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Sync Progress</div>
+        <div class="meta-value" id="sync">—</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Peers</div>
+        <div class="meta-value" id="connections">—</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Node Version</div>
+        <div class="meta-value" id="version">—</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Mempool</div>
+        <div class="meta-value" id="mempool_tx">—</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Uptime</div>
+        <div class="meta-value" id="uptime">—</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Last Update</div>
+        <div class="meta-value" id="updated">Live</div>
+      </div>
+    </section>
+
+    <section class="support-block">
+      <p><strong>Support this node:</strong></p>
+      <p>
+        Contributions help sustain independent Bitcoin verification
+        infrastructure.
+      </p>
+
+      <div class="address-box">
+        <a href="bitcoin:bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75" class="address-link"
+          title="Open in Bitcoin wallet">
+          <code id="donation-btc-address">bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75</code>
+        </a>
+
+        <button type="button" class="copy-btn" id="copy-donation-btc" onclick="copyDonationBTC()">
+          Copy
+        </button>
+      </div>
+
+      <p class="small-note">
+        Support helps maintain independent public Bitcoin verification infrastructure.
+      </p>
+
+      <div class="links">
+        <a href="https://stream.cosigo.io/">Live stream</a>
+        <a href="https://cosigo.io/">Return to COSIGO</a>
+
+        <div class="cigo-trade-note">
+          <img class="cigo-note-icon" src="/assets/cigo_256.png" alt="CIGO icon">
+          <p class="cigo-note-copy">
+            <strong>CIGO trade access:</strong>
+            CIGO is the protected speculative market-access rail related to COSIGO activity.
+            Use the official <a href="https://trade.cosigo.io/" target="_blank" rel="noopener">CIGO trade page</a>
+            for current swap access, wallet guidance, and current contract references.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <p class="footnote">
+      This interface is public and intended for transparency into
+      node status and Bitcoin verification infrastructure.
+    </p>
+  </main>
+
+<script>
+(function () {
+  const fields = {
+    "NETWORK": "network",
+    "MODE": "mode",
+    "STATUS": "status",
+    "BLOCKS": "blocks",
+    "HEADERS": "headers",
+    "SYNC PROGRESS": "sync_progress",
+    "PEERS": "peers",
+    "NODE VERSION": "node_version",
+    "MEMPOOL": "mempool",
+    "UPTIME": "uptime",
+    "LAST UPDATE": "last_update"
+  };
+
+  function pretty(key, value, data) {
+    if (value === undefined || value === null || value === "") return "—";
+    if (key === "network" && value === "main") return "Bitcoin mainnet";
+    if (key === "sync_progress" && data.initial_block_download === false && data.blocks === data.headers) return "Complete";
+    return String(value);
+  }
+
+  function leafText(el) {
+    return el.children.length === 0 ? el.textContent.trim().toUpperCase() : "";
+  }
+
+  function setMetric(labelText, value) {
+    const wanted = labelText.toUpperCase();
+
+    const labels = Array.from(document.querySelectorAll("body *")).filter(el => leafText(el) === wanted);
+
+    for (const labelEl of labels) {
+      let card = labelEl.parentElement;
+
+      // climb until parent contains at least 2 leaf elements: label + value
+      for (let i = 0; card && i < 5; i++, card = card.parentElement) {
+        const leaves = Array.from(card.querySelectorAll("*")).filter(el => el.children.length === 0);
+        const valueCandidates = leaves.filter(el => el !== labelEl && leafText(el) !== wanted);
+
+        if (valueCandidates.length) {
+          const target = valueCandidates[valueCandidates.length - 1];
+          target.textContent = value;
+          target.setAttribute("data-live", "true");
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  async function refreshBcnodeStatus() {
+    try {
+      const res = await fetch("/status.json?t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+
+      for (const [label, key] of Object.entries(fields)) {
+        setMetric(label, pretty(key, data[key], data));
+      }
+
+      document.documentElement.setAttribute("data-bcnode-status", "live");
+    } catch (err) {
+      console.warn("bcnode status refresh failed:", err);
+      setMetric("STATUS", "Feed unavailable");
+      document.documentElement.setAttribute("data-bcnode-status", "error");
+    }
+  }
+
+  refreshBcnodeStatus();
+  setInterval(refreshBcnodeStatus, 30000);
+})();
+</script>
+
+</body>
+
+</html>

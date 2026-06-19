@@ -1,0 +1,4 @@
+backups/
+status.json
+*.tmp
+*.log
