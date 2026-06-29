@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>bcnode.io — Bitcoin Node Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --bg: #100b07;
+      --panel: rgba(28, 20, 13, 0.92);
+      --panel2: rgba(48, 31, 17, 0.84);
+      --gold: #e6c06d;
+      --gold2: #f3d995;
+      --copper: #a76532;
+      --silver: #c9c7be;
+      --purple: rgba(126, 76, 154, 0.36);
+      --text: #f7ead0;
+      --muted: rgba(247, 234, 208, 0.72);
+      --border: rgba(230, 192, 109, 0.38);
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(168, 101, 50, 0.22), transparent 36%),
+        radial-gradient(circle at top right, rgba(126, 76, 154, 0.18), transparent 34%),
+        linear-gradient(180deg, #100b07, #050403 72%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a { color: var(--gold2); }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 46px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      box-shadow: 0 0 16px rgba(230, 192, 109, 0.35);
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      background: rgba(0,0,0,0.25);
+      box-shadow: 0 0 12px rgba(230, 192, 109, 0.13);
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 14px 0 8px;
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1;
+      color: var(--gold2);
+      letter-spacing: -0.04em;
+    }
+
+    .lede {
+      margin: 0 0 22px;
+      color: var(--muted);
+      max-width: 820px;
+      font-size: 1.05rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(135deg, var(--panel), var(--panel2));
+      box-shadow:
+        0 0 0 1px rgba(255, 238, 185, 0.06) inset,
+        0 16px 34px rgba(0,0,0,0.24),
+        0 0 18px var(--purple);
+    }
+
+    .card.wide { grid-column: span 2; }
+    .card.full { grid-column: 1 / -1; }
+
+    .label {
+      color: var(--muted);
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--gold2);
+      overflow-wrap: anywhere;
+    }
+
+    .sub {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .bar {
+      height: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.11);
+      margin-top: 12px;
+    }
+
+    .fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--copper), var(--gold), var(--silver));
+      box-shadow: 0 0 14px rgba(230, 192, 109, 0.35);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(230, 192, 109, 0.18);
+      text-align: left;
+    }
+
+    th {
+      color: var(--gold2);
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    td { color: var(--text); }
+
+    .notice {
+      border-color: rgba(201, 199, 190, 0.30);
+      background:
+        linear-gradient(135deg,
+          rgba(24, 17, 10, 0.96),
+          rgba(76, 47, 23, 0.76),
+          rgba(29, 20, 40, 0.80)
+        );
+    }
+
+    .status-ok { color: #d9f3bb; }
+    .status-warn { color: #ffd18c; }
+
+    footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card.wide { grid-column: span 2; }
+    }
+
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: 1fr; }
+      .card.wide { grid-column: 1; }
+      .value { font-size: 1.45rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="top">
+      <a class="brand" href="/">
+        <img src="/assets/cigo_256.png" alt="bcnode">
+        <strong>bcnode.io</strong>
+      </a>
+      <nav class="nav" aria-label="bcnode navigation">
+        <a class="pill" href="/">home</a>
+        <a class="pill" href="https://explorer.bcnode.io/">explorer</a>
+        <a class="pill" href="https://cosigo.io/">COSIGO</a>
+        <a class="pill" href="https://trade.cosigo.io/">CIGO trade</a>
+      </nav>
+    </div>
+
+    <h1>Bitcoin node dashboard</h1>
+    <p class="lede">
+      Live public status for the COSIGO-operated Bitcoin node. This page shows node health,
+      peer count, mempool status, fee estimates, and bandwidth policy without exposing private RPC.
+    </p>
+
+    <section class="grid">
+      <article class="card">
+        <div class="label">Status</div>
+        <div class="value" id="status">loading</div>
+        <div class="sub" id="generated">waiting for status.json</div>
+      </article>
+
+      <article class="card">
+        <div class="label">Block height</div>
+        <div class="value" id="height">—</div>
+        <div class="sub" id="chain">chain: —</div>
+      </article>
+
+      <article class="card">
+        <div class="label">Peers</div>
+        <div class="value" id="peers">—</div>
+        <div class="sub" id="peerSplit">inbound — / outbound —</div>
+      </article>
+
+      <article class="card">
+        <div class="label">Mode</div>
+        <div class="value" id="mode">—</div>
+        <div class="sub" id="prune">prune status</div>
+      </article>
+
+      <article class="card wide">
+        <div class="label">Mempool</div>
+        <div class="value" id="mempool">—</div>
+        <div class="sub" id="mempoolSub">transactions / bytes</div>
+      </article>
+
+      <article class="card wide">
+        <div class="label">Daily historical upload cap</div>
+        <div class="value" id="bandwidthPct">—</div>
+        <div class="bar"><div class="fill" id="bandwidthFill"></div></div>
+        <div class="sub" id="bandwidthSub">waiting for upload target</div>
+      </article>
+
+      <article class="card full">
+        <div class="label">Fee estimates</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Target</th>
+              <th>Estimated fee rate</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="feeRows">
+            <tr><td colspan="3">Loading fee estimates…</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="card notice full">
+        <div class="label">Public bandwidth policy</div>
+        <div class="value">Rate-limited, not unlimited</div>
+        <p>
+          bcnode.io is operated as independent COSIGO Bitcoin infrastructure. The node is public,
+          but bandwidth, uptime, monitoring, and maintenance are not free.
+        </p>
+        <p>
+          Historical block serving is rate-limited for sustainability. Stable Bitcoin peers that need
+          higher bandwidth may request operator-verified peer review by providing their node IP address.
+          Support does not buy consensus influence, transaction priority, private RPC access, or guaranteed uptime.
+        </p>
+        <a class="pill" href="https://contact.cosigo.io/">request operator-verified peer review / support</a>
+        <p class="subtle-note opverified-note">
+          Operator-verified peers are known connections used by the bcnode.io operator for connectivity checks.
+          This is not a trust endorsement, approval system, or ranking of Bitcoin peers.
+        </p>
+
+        <div class="policy-card opverified-peer-card">
+          <h3>First operator-verified peer</h3>
+          <p>
+            This peer is a Bitcoin Core node controlled by the bcnode.io operator and is used for
+            connectivity checks against the public server node.
+          </p>
+          <dl>
+            <dt>Peer label</dt>
+            <dd><code>/Satoshi:31.0.0(bcnode_dot_io)/</code></dd>
+            <dt>Current observed address</dt>
+            <dd><code>189.180.145.200</code></dd>
+            <dt>Status</dt>
+            <dd><strong>operator-verified connectivity check</strong></dd>
+          </dl>
+          <p class="subtle-note">
+            This is not a Bitcoin peer approval system, trust endorsement, transaction priority service,
+            or consensus privilege. It only identifies a known operator-controlled connection.
+          </p>
+        </div>
+
+      </article>
+    </section>
+
+    <footer>
+      Updates every 30 seconds from public status data generated locally by the node.
+    </footer>
+  </main>
+
+  <script>
+    function fmtNum(n) {
+      if (n === null || n === undefined || Number.isNaN(Number(n))) return "—";
+      return Number(n).toLocaleString();
+    }
+
+    function fmtBytes(n) {
+      if (n === null || n === undefined || !Number.isFinite(Number(n))) return "—";
+      const units = ["B", "KB", "MB", "GB", "TB"];
+      let v = Number(n);
+      let i = 0;
+      while (v >= 1024 && i < units.length - 1) {
+        v /= 1024;
+        i++;
+      }
+      return v.toFixed(i === 0 ? 0 : 2) + " " + units[i];
+    }
+
+    function feeText(item) {
+      if (!item || item.feerate === undefined || item.feerate === null) return "unavailable";
+      return item.feerate.toFixed(8) + " BTC/kvB";
+    }
+
+    async function update() {
+      const res = await fetch("/status.json?t=" + Date.now(), { cache: "no-store" });
+      const d = await res.json();
+
+      document.getElementById("status").textContent = d.ok ? "online" : "limited";
+      document.getElementById("status").className = "value " + (d.ok ? "status-ok" : "status-warn");
+      document.getElementById("generated").textContent = d.generatedAt ? "updated " + d.generatedAt + " UTC" : "updated —";
+
+      document.getElementById("height").textContent = fmtNum(d.blockHeight || d.blocks || d.height);
+      document.getElementById("chain").textContent = "chain: " + (d.chain || "unknown");
+
+      document.getElementById("peers").textContent = fmtNum(d.peerCount || d.connections);
+      document.getElementById("peerSplit").textContent =
+        "inbound " + fmtNum(d.inbound ?? d.connections_in) +
+        " / outbound " + fmtNum(d.outbound ?? d.connections_out);
+
+      document.getElementById("mode").textContent = d.pruned ? "pruned" : "full";
+      document.getElementById("prune").textContent =
+        d.pruned ? "prune height " + fmtNum(d.pruneheight) : "not pruned";
+
+      const mp = d.mempool_info || d.mempoolDetails || (d.mempool && typeof d.mempool === "object" ? d.mempool : {});
+      document.getElementById("mempool").textContent = fmtNum(mp.size) + " tx";
+      document.getElementById("mempoolSub").textContent =
+        fmtBytes(mp.bytes) + " mempool bytes · " + fmtBytes(mp.usage) + " memory usage";
+
+      const up = d.uploadtarget || d.net_totals?.uploadtarget || d.netTotals?.uploadtarget;
+      if (up && Number(up.target) > 0) {
+        const target = Number(up.target);
+        const left = Number(up.bytes_left_in_cycle || 0);
+        const used = Math.max(0, target - left);
+        const pct = Math.max(0, Math.min(100, used / target * 100));
+        document.getElementById("bandwidthPct").textContent = pct.toFixed(3) + "% used";
+        document.getElementById("bandwidthFill").style.width = Math.max(0.35, pct).toFixed(3) + "%";
+        document.getElementById("bandwidthSub").textContent =
+          "used " + fmtBytes(used) + " / cap " + fmtBytes(target) +
+          " · remaining " + fmtBytes(left);
+      } else {
+        document.getElementById("bandwidthPct").textContent = "unlimited/unknown";
+        document.getElementById("bandwidthSub").textContent = "upload target not available";
+      }
+
+      const targets = ["1", "3", "6", "12", "24"];
+      const rows = targets.map(t => {
+        const item = d.fees ? d.fees[t] : null;
+        const note = item && item.errors ? item.errors.join("; ") : "estimate from local Bitcoin Core";
+        return `<tr><td>${t} block${t === "1" ? "" : "s"}</td><td>${feeText(item)}</td><td>${note}</td></tr>`;
+      }).join("");
+      document.getElementById("feeRows").innerHTML = rows;
+    }
+
+    update().catch(err => {
+      document.getElementById("status").textContent = "error";
+      document.getElementById("generated").textContent = String(err);
+    });
+
+    setInterval(() => update().catch(() => {}), 30000);
+  </script>
+</body>
+</html>

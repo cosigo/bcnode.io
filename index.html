@@ -386,6 +386,114 @@
     }
   </style>
 
+
+<style id="bcnode-bandwidth-notice-css">
+  .bcnode-bandwidth-notice {
+    margin: 28px 0;
+    padding: 18px 20px;
+    border-radius: 18px;
+    border: 1px solid rgba(218, 177, 92, 0.48);
+    background:
+      linear-gradient(135deg,
+        rgba(25, 17, 10, 0.96),
+        rgba(66, 42, 21, 0.82),
+        rgba(31, 22, 40, 0.80)
+      );
+    box-shadow:
+      0 0 0 1px rgba(255, 232, 170, 0.08) inset,
+      0 12px 30px rgba(0,0,0,0.30),
+      0 0 18px rgba(122, 71, 150, 0.14);
+  }
+
+  .bcnode-bandwidth-notice h2 {
+    margin: 0 0 8px;
+    color: #f1d286;
+  }
+
+  .bcnode-bandwidth-notice p {
+    margin: 8px 0;
+  }
+
+  .bcnode-bandwidth-meter {
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(192, 192, 192, 0.22);
+    background: rgba(0,0,0,0.22);
+  }
+
+  .bcnode-bandwidth-bar {
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+
+  .bcnode-bandwidth-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: 999px;
+    background:
+      linear-gradient(90deg,
+        rgba(152, 91, 38, 0.95),
+        rgba(223, 181, 92, 0.95),
+        rgba(192, 192, 192, 0.88)
+      );
+    box-shadow: 0 0 10px rgba(218, 177, 92, 0.36);
+  }
+
+  .bcnode-bandwidth-small {
+    margin-top: 8px;
+    font-size: 0.92rem;
+    opacity: 0.86;
+  }
+
+  .bcnode-support-pill {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 12px;
+    padding: 8px 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(236, 197, 112, 0.58);
+    color: #fff3cf;
+    text-decoration: none;
+    background: rgba(0,0,0,0.28);
+    box-shadow: 0 0 12px rgba(214, 174, 94, 0.15);
+    font-weight: 700;
+  }
+</style>
+
+
+<style id="bcnode-network-link-card-css">
+  .bcnode-network-link-card {
+    margin: 24px 0;
+    padding: 18px 20px;
+    border-radius: 18px;
+    border: 1px solid rgba(218, 177, 92, 0.48);
+    background: linear-gradient(135deg, rgba(25,17,10,.96), rgba(66,42,21,.82), rgba(31,22,40,.80));
+    box-shadow: 0 0 0 1px rgba(255,232,170,.08) inset, 0 12px 30px rgba(0,0,0,.30);
+  }
+  .bcnode-network-link-card h2 {
+    margin: 0 0 8px;
+    color: #f1d286;
+  }
+  .bcnode-network-link-card p {
+    margin: 8px 0 14px;
+  }
+  .bcnode-network-link-card a {
+    display: inline-flex;
+    padding: 8px 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(236,197,112,.58);
+    color: #fff3cf;
+    text-decoration: none;
+    background: rgba(0,0,0,.28);
+    box-shadow: 0 0 12px rgba(214,174,94,.15);
+    font-weight: 700;
+  }
+</style>
+
 </head>
 
 <body>
@@ -516,7 +624,33 @@
       This interface is public and intended for transparency into
       node status and Bitcoin verification infrastructure.
     </p>
-  </main>
+  
+
+<section class="bcnode-network-link-card" id="bcnode-network-dashboard-link">
+  <h2>Live node dashboard</h2>
+  <p>View public Bitcoin node status, bandwidth cap, peers, mempool size, and fee estimates.</p>
+  <a href="/network.html">open node dashboard</a>
+</section>
+
+<section class="bcnode-bandwidth-notice" id="public-node-bandwidth">
+  <h2>Public node bandwidth is rate-limited</h2>
+  <p><strong>bcnode.io is operated as independent COSIGO Bitcoin infrastructure.</strong> The node is public, but bandwidth, uptime, monitoring, and maintenance are not free.</p>
+  <p>To keep the node sustainable, historical block serving may be rate-limited. Stable Bitcoin peers that need higher bandwidth may request operator-verified peer review by providing their node IP address. Voluntary support helps keep the node online and may help justify higher bandwidth limits.</p>
+  <p>Support does not buy consensus influence, transaction priority, private RPC access, or guaranteed uptime.</p>
+
+  <div class="bcnode-bandwidth-meter" aria-label="Bitcoin node bandwidth meter">
+    <div class="bcnode-bandwidth-bar">
+      <div class="bcnode-bandwidth-fill" style="width:0%"></div>
+    </div>
+    <div class="bcnode-bandwidth-small" id="bcnode-bandwidth-text">
+      Current daily upload cap: 5 GiB. Live percentage updates when node bandwidth data is available.
+    </div>
+  </div>
+
+  <a class="bcnode-support-pill" href="https://contact.cosigo.io/">request operator-verified peer review / support</a>
+</section>
+
+</main>
 
 <script>
 (function () {
@@ -590,6 +724,57 @@
 
   refreshBcnodeStatus();
   setInterval(refreshBcnodeStatus, 30000);
+})();
+</script>
+
+
+<script id="bcnode-bandwidth-notice-js">
+(function () {
+  function fmtBytes(n) {
+    if (!Number.isFinite(n)) return "unknown";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    let v = n, i = 0;
+    while (v >= 1024 && i < units.length - 1) {
+      v /= 1024;
+      i++;
+    }
+    return v.toFixed(i === 0 ? 0 : 2) + " " + units[i];
+  }
+
+  async function updateBandwidthMeter() {
+    const text = document.getElementById("bcnode-bandwidth-text");
+    const fill = document.querySelector(".bcnode-bandwidth-fill");
+    if (!text || !fill) return;
+
+    try {
+      const res = await fetch("/status.json?t=" + Date.now(), { cache: "no-store" });
+      const data = await res.json();
+
+      const upload = data.uploadtarget || data.net_totals?.uploadtarget || data.netTotals?.uploadtarget;
+      const totalSent = data.totalbytessent || data.net_totals?.totalbytessent || data.netTotals?.totalbytessent;
+
+      if (!upload || !upload.target || !Number.isFinite(Number(upload.target))) {
+        text.textContent = "Current daily upload cap: 5 GiB. Live percentage will appear after status.json includes uploadtarget data.";
+        return;
+      }
+
+      const target = Number(upload.target);
+      const left = Number(upload.bytes_left_in_cycle || 0);
+      const used = Math.max(0, target - left);
+      const pct = Math.max(0, Math.min(100, (used / target) * 100));
+
+      fill.style.width = Math.max(0.35, pct).toFixed(3) + "%";
+      text.textContent =
+        "Daily historical upload cap: " + fmtBytes(target) +
+        " · used this cycle: " + pct.toFixed(4) + "%" +
+        " · remaining: " + fmtBytes(left || (target - used));
+    } catch (e) {
+      text.textContent = "Current daily upload cap: 5 GiB. Live bandwidth data is temporarily unavailable.";
+    }
+  }
+
+  updateBandwidthMeter();
+  setInterval(updateBandwidthMeter, 30000);
 })();
 </script>
 
