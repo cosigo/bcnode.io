@@ -205,7 +205,55 @@
       .card.wide { grid-column: 1; }
       .value { font-size: 1.45rem; }
     }
-  </style>
+
+  .system-health-card {
+    margin-top: 18px;
+    padding: 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(201, 199, 190, 0.26);
+    background: rgba(0,0,0,0.20);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05) inset;
+  }
+
+  .system-health-card h2 {
+    margin: 0 0 10px;
+    color: var(--gold2);
+    font-size: 1.05rem;
+  }
+
+  .system-health-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .system-health-item {
+    padding: 10px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .system-health-label {
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .system-health-value {
+    margin-top: 4px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  @media (max-width: 760px) {
+    .system-health-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+</style>
 </head>
 <body>
   <main class="wrap">
@@ -408,5 +456,101 @@
 
     setInterval(() => update().catch(() => {}), 30000);
   </script>
+
+<script id="bcnode-system-health-js">
+(function () {
+  function fmtBytes(n) {
+    if (!Number.isFinite(Number(n))) return "unknown";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    let v = Number(n), i = 0;
+    while (v >= 1024 && i < units.length - 1) {
+      v /= 1024;
+      i++;
+    }
+    return v.toFixed(i === 0 ? 0 : 1) + " " + units[i];
+  }
+
+  function fmtLoad(n) {
+    return Number.isFinite(Number(n)) ? Number(n).toFixed(2) : "unknown";
+  }
+
+  function ensureCard() {
+    let card = document.getElementById("systemHealthCard");
+    if (card) return card;
+
+    card = document.createElement("section");
+    card.id = "systemHealthCard";
+    card.className = "system-health-card";
+    card.innerHTML = `
+      <h2>Server quick health</h2>
+      <div class="sub" style="margin:-4px 0 12px;">
+        CPU load is shown as 1 min / 5 min / 15 min average. Below 1.00 is light on a 1-core server.
+      </div>
+      <div class="system-health-grid">
+        <div class="system-health-item">
+          <div class="system-health-label">CPU load avg</div>
+          <div class="system-health-value" id="sysLoad">—</div>
+        </div>
+        <div class="system-health-item">
+          <div class="system-health-label">RAM available</div>
+          <div class="system-health-value" id="sysRam">—</div>
+        </div>
+        <div class="system-health-item">
+          <div class="system-health-label">Disk used</div>
+          <div class="system-health-value" id="sysDisk">—</div>
+        </div>
+        <div class="system-health-item">
+          <div class="system-health-label">bitcoind RAM</div>
+          <div class="system-health-value" id="sysBitcoind">—</div>
+        </div>
+      </div>
+      <div class="sub" id="sysUpdated" style="margin-top:10px;">waiting for status.json</div>
+    `;
+
+    const anchor = document.querySelector(".wrap");
+    if (anchor) {
+      anchor.appendChild(card);
+    } else {
+      document.body.appendChild(card);
+    }
+    return card;
+  }
+
+  async function updateSystemHealth() {
+    ensureCard();
+
+    try {
+      const res = await fetch("/status.json?t=" + Date.now(), { cache: "no-store" });
+      const d = await res.json();
+      const s = d.system || {};
+
+      document.getElementById("sysLoad").textContent =
+        fmtLoad(s.load1) + " / " + fmtLoad(s.load5) + " / " + fmtLoad(s.load15) +
+        " · " + (Number(s.load1) < 0.70 ? "light" : Number(s.load1) < 1.50 ? "moderate" : "busy");
+
+      document.getElementById("sysRam").textContent =
+        fmtBytes(s.memoryAvailableBytes) + " / " + fmtBytes(s.memoryTotalBytes);
+
+      document.getElementById("sysDisk").textContent =
+        (Number.isFinite(Number(s.diskUsedPercent)) ? Number(s.diskUsedPercent).toFixed(1) + "%" : "unknown") +
+        " · " + fmtBytes(s.diskAvailableBytes) + " free";
+
+      document.getElementById("sysBitcoind").textContent =
+        fmtBytes(s.bitcoindRssBytes);
+
+      document.getElementById("sysUpdated").textContent =
+        d.generatedAt ? "updated " + d.generatedAt + " UTC" : "updated —";
+    } catch (e) {
+      document.getElementById("sysUpdated").textContent = "system health temporarily unavailable";
+    }
+  }
+
+  updateSystemHealth();
+  setInterval(updateSystemHealth, 30000);
+})();
+</script>
+
 </body>
 </html>
+
+
