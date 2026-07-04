@@ -313,24 +313,7 @@
         <div class="bar"><div class="fill" id="bandwidthFill"></div></div>
         <div class="sub" id="bandwidthSub">waiting for upload target</div>
       </article>
-
-      <article class="card full">
-        <div class="label">Fee estimates</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Target</th>
-              <th>Estimated fee rate</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody id="feeRows">
-            <tr><td colspan="3">Loading fee estimates…</td></tr>
-          </tbody>
-        </table>
-      </article>
-
-      <article class="card notice full">
+<article class="card notice full">
         <div class="label">Public bandwidth policy</div>
         <div class="value">Rate-limited, not unlimited</div>
         <p>
@@ -440,13 +423,6 @@
         document.getElementById("bandwidthSub").textContent = "upload target not available";
       }
 
-      const targets = ["1", "3", "6", "12", "24"];
-      const rows = targets.map(t => {
-        const item = d.fees ? d.fees[t] : null;
-        const note = item && item.errors ? item.errors.join("; ") : "estimate from local Bitcoin Core";
-        return `<tr><td>${t} block${t === "1" ? "" : "s"}</td><td>${feeText(item)}</td><td>${note}</td></tr>`;
-      }).join("");
-      document.getElementById("feeRows").innerHTML = rows;
     }
 
     update().catch(err => {
