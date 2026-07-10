@@ -481,6 +481,15 @@
   .bcnode-network-link-card p {
     margin: 8px 0 14px;
   }
+  .bcnode-network-link-card .bcnode-maintenance-note {
+    margin: 10px 0 14px;
+    padding: 9px 11px;
+    border-radius: 12px;
+    border: 1px solid rgba(236,197,112,.28);
+    background: rgba(0,0,0,.20);
+    color: #d7c9a8;
+    font-size: 0.94rem;
+  }
   .bcnode-network-link-card a {
     display: inline-flex;
     padding: 8px 13px;
@@ -629,6 +638,9 @@
 <section class="bcnode-network-link-card" id="bcnode-network-dashboard-link">
   <h2>Live node dashboard</h2>
   <p>View public Bitcoin node status, bandwidth cap, peers, mempool size, and fee estimates.</p>
+  <p class="bcnode-maintenance-note">
+    Maintenance: peer capacity was adjusted to 150 on 2026-07-10. Brief peer disconnects can occur during planned restarts.
+  </p>
   <a href="/network.html">open node dashboard</a>
 </section>
 
