@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>bcnode.io — Peer Load Watch</title>
+  <meta name="description" content="Public masked peer load watch for bcnode.io. Shows likely Bitcoin peer load suspects from traffic, ping, and in-flight request data without exposing private RPC." />
+  <link rel="canonical" href="https://bcnode.io/peer-load.html" />
+  <link rel="icon" type="image/png" href="/assets/cigo_256.png" />
+  <style>
+    :root {
+      --bg: #0a0d12;
+      --panel: #121720;
+      --line: rgba(255,255,255,.10);
+      --ink: #edf2ff;
+      --muted: #a9b4c8;
+      --gold: #d4af37;
+      --warn: #facc15;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(900px 500px at 20% 0%, rgba(212,175,55,.05), transparent 60%),
+        linear-gradient(180deg, #07090d, #0d121a);
+      color: var(--ink);
+      font: 16px/1.5 Georgia, "Times New Roman", serif;
+      padding: 24px;
+    }
+    main {
+      width: min(1160px, 100%);
+      margin: 0 auto;
+      background: rgba(18,23,32,.86);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(32px, 5vw, 54px);
+      line-height: 1;
+      color: var(--gold);
+    }
+    h2 {
+      margin: 24px 0 10px;
+      color: #f1d286;
+    }
+    p { color: var(--muted); margin: 0 0 14px; font-size: 17px; }
+    a { color: #fde68a; text-decoration: none; font-weight: 700; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 18px 0 20px;
+    }
+    .actions a {
+      display: inline-flex;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(236,197,112,.45);
+      background: rgba(0,0,0,.24);
+      color: #fff3cf;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .card {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      border-radius: 16px;
+      padding: 13px 14px;
+    }
+    .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      margin-bottom: 5px;
+    }
+    .value {
+      font-size: 18px;
+      overflow-wrap: anywhere;
+    }
+    .notice {
+      margin: 18px 0;
+      padding: 13px 15px;
+      border-radius: 14px;
+      border: 1px solid rgba(236,197,112,.28);
+      background: rgba(0,0,0,.20);
+      color: #d7c9a8;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(0,0,0,.16);
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      min-width: 920px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      text-align: left;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    th {
+      color: #f1d286;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      background: rgba(0,0,0,.20);
+    }
+    td {
+      color: #dfe7f6;
+    }
+    .muted { color: var(--muted); }
+    .empty {
+      padding: 14px;
+      color: var(--muted);
+    }
+    .footnote {
+      margin-top: 22px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Peer load watch</h1>
+  <p>
+    Public masked peer-load view for bcnode.io. This helps identify likely bandwidth/load-heavy Bitcoin peers from traffic,
+    ping, and in-flight request data.
+  </p>
+
+  <div class="actions">
+    <a href="/">bcnode home</a>
+    <a href="/network.html">live node dashboard</a>
+  </div>
+
+  <div class="notice" id="notice">
+    Loading peer-load data…
+  </div>
+
+  <section class="summary">
+    <div class="card"><div class="label">Updated</div><div class="value" id="updated">—</div></div>
+    <div class="card"><div class="label">Peers</div><div class="value" id="peers">—</div></div>
+    <div class="card"><div class="label">Inbound / outbound</div><div class="value" id="directions">—</div></div>
+    <div class="card"><div class="label">Mempool</div><div class="value" id="mempool">—</div></div>
+    <div class="card"><div class="label">CPU pressure</div><div class="value" id="cpu-pressure">—</div></div>
+    <div class="card"><div class="label">Memory pressure</div><div class="value" id="memory-pressure">—</div></div>
+  </section>
+
+  <h2>Likely load suspects</h2>
+  <div class="table-wrap" id="suspects"></div>
+
+  <h2>Top sent-rate peers</h2>
+  <p class="muted">Peers receiving the most data from this node per minute during their current connection.</p>
+  <div class="table-wrap" id="top_sent_rate"></div>
+
+  <h2>Top total traffic</h2>
+  <div class="table-wrap" id="top_total_traffic"></div>
+
+  <h2>Active in-flight requests</h2>
+  <div class="table-wrap" id="active_inflight"></div>
+
+  <h2>Slow peers</h2>
+  <div class="table-wrap" id="slow_peers"></div>
+
+  <p class="footnote">
+    This page does not expose private RPC. Peer addresses are masked. Bitcoin Core does not provide exact per-peer CPU accounting;
+    this page shows likely load suspects using public peer traffic indicators.
+  </p>
+</main>
+
+<script>
+function esc(v) {
+  return String(v ?? "—").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+function pressureAvg10(block) {
+  if (!block || !block.some) return "—";
+  return Number(block.some.avg10 || 0).toFixed(2) + "%";
+}
+
+function renderTable(id, rows) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!rows || !rows.length) {
+    el.innerHTML = '<div class="empty">none</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>dir</th>
+          <th>age min</th>
+          <th>sent MiB</th>
+          <th>recv MiB</th>
+          <th>total MiB</th>
+          <th>sent/min</th>
+          <th>total/min</th>
+          <th>ping ms</th>
+          <th>fly</th>
+          <th>addr</th>
+          <th>subver</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr>
+            <td>${esc(r.id)}</td>
+            <td>${esc(r.direction)}</td>
+            <td>${esc(r.age_minutes)}</td>
+            <td>${esc(r.sent_mib)}</td>
+            <td>${esc(r.recv_mib)}</td>
+            <td>${esc(r.total_mib)}</td>
+            <td>${esc(r.sent_mib_per_min)}</td>
+            <td>${esc(r.total_mib_per_min)}</td>
+            <td>${esc(r.ping_ms)}</td>
+            <td>${esc(r.inflight)}</td>
+            <td>${esc(r.address)}</td>
+            <td>${esc(r.subver)}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>`;
+}
+
+async function refresh() {
+  try {
+    const res = await fetch("/peer-load.json?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    const s = data.summary || {};
+    const p = data.system_pressure || {};
+    const t = data.tables || {};
+
+    document.getElementById("notice").textContent = data.notice || "Peer-load data loaded.";
+    document.getElementById("updated").textContent = data.updated || "—";
+    document.getElementById("peers").textContent = s.connections ?? "—";
+    document.getElementById("directions").textContent = `${s.connections_in ?? "—"} / ${s.connections_out ?? "—"}`;
+    document.getElementById("mempool").textContent = `${s.mempool_tx ?? "—"} tx · ${s.mempool_usage_mib ?? "—"} MiB`;
+    document.getElementById("cpu-pressure").textContent = pressureAvg10(p.cpu);
+    document.getElementById("memory-pressure").textContent = pressureAvg10(p.memory);
+
+    renderTable("suspects", t.suspects);
+    renderTable("top_sent_rate", t.top_sent_rate);
+    renderTable("top_total_traffic", t.top_total_traffic);
+    renderTable("active_inflight", t.active_inflight);
+    renderTable("slow_peers", t.slow_peers);
+  } catch (err) {
+    document.getElementById("notice").textContent = "Peer-load data is temporarily unavailable.";
+    console.warn(err);
+  }
+}
+
+refresh();
+setInterval(refresh, 120000);
+</script>
+</body>
+</html>

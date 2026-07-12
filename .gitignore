@@ -2,3 +2,5 @@ backups/
 status.json
 *.tmp
 *.log
+
+peer-load.json
