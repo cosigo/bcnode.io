@@ -151,6 +151,66 @@
     font-weight: 700;
   }
 
+
+/* BCNODE DONATION STYLE START */
+.bcnode-donation-callout {
+  margin: 1.25rem 0;
+  padding: 1rem;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 16px;
+  background: rgba(255,255,255,.055);
+  display: flex;
+  gap: .9rem;
+  align-items: flex-start;
+}
+
+.bcnode-donation-mark {
+  width: 2.25rem;
+  height: 2.25rem;
+  min-width: 2.25rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 1.35rem;
+  font-weight: 800;
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.08);
+}
+
+.bcnode-donation-callout h2,
+.bcnode-donation-callout h3 {
+  margin: 0 0 .35rem;
+}
+
+.bcnode-donation-callout p {
+  margin: .25rem 0 .7rem;
+}
+
+.bcnode-donation-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  align-items: center;
+}
+
+.bcnode-donation-address {
+  font-size: .92rem;
+  overflow-wrap: anywhere;
+  padding: .45rem .6rem;
+  border-radius: 10px;
+  background: rgba(0,0,0,.18);
+}
+
+.bcnode-copy-btc {
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 999px;
+  padding: .45rem .75rem;
+  background: rgba(255,255,255,.08);
+  color: inherit;
+}
+/* BCNODE DONATION STYLE END */
+
 </style>
 </head>
 <body>
@@ -212,6 +272,21 @@
     This page does not expose private RPC. Peer addresses are masked. Bitcoin Core does not provide exact per-peer CPU accounting;
     this page shows likely load suspects using public peer traffic indicators.
   </p>
+
+<!-- BCNODE DONATION CALLOUT START -->
+<section class="bcnode-donation-callout" aria-label="Support bcnode.io">
+  <div class="bcnode-donation-mark" aria-hidden="true">₿</div>
+  <div>
+    <h3>Keep this node healthy and viable</h3>
+    <p>Donations help keep bcnode.io online, monitored, and useful as independent public Bitcoin verification infrastructure.</p>
+    <div class="bcnode-donation-row">
+      <code class="bcnode-donation-address">bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75</code>
+      <button class="bcnode-copy-btc" type="button" data-bcnode-copy-btc="bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75">copy bitcoin address</button>
+    </div>
+  </div>
+</section>
+<!-- BCNODE DONATION CALLOUT END -->
+
 </main>
 
 <script>
@@ -304,5 +379,25 @@ async function refresh() {
 refresh();
 setInterval(refresh, 120000);
 </script>
+
+<script>
+/* BCNODE DONATION COPY START */
+document.addEventListener("click", async function (event) {
+  const button = event.target.closest("[data-bcnode-copy-btc]");
+  if (!button) return;
+
+  const value = button.getAttribute("data-bcnode-copy-btc");
+  try {
+    await navigator.clipboard.writeText(value);
+    const oldText = button.textContent;
+    button.textContent = "copied";
+    setTimeout(() => { button.textContent = oldText; }, 1400);
+  } catch (err) {
+    window.prompt("Copy Bitcoin address:", value);
+  }
+});
+/* BCNODE DONATION COPY END */
+</script>
+
 </body>
 </html>
