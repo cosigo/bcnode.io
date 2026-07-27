@@ -15,6 +15,16 @@ Last major operating state:
 
 ---
 
+## Why this is published
+
+bcnode.io publishes these basic operations notes so other small Bitcoin node operators can see how this node is run: peer limits, public status generation, masked peer telemetry, bandwidth policy, and automatic peer-quality controls.
+
+This node is operator-funded in both time and money. It welcomes ordinary Bitcoin peer connections, but it is not intended to be free backend infrastructure for commercial, indexing, gambling, exchange, analytics, wallet-backend, or other high-volume services. Those services should operate and fund their own Bitcoin infrastructure.
+
+The operating goal is normality: stable service, honest public peer access, controlled bandwidth, low server pressure, and automatic trimming of peers that repeatedly create poor connection quality or excessive load.
+
+---
+
 ## 1. Core paths
 
 ### Site repo
