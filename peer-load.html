@@ -133,7 +133,25 @@
       font-size: 14px;
       color: var(--muted);
     }
-  </style>
+  
+  .peer-policy-notice {
+    margin: 14px 0 18px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(236,197,112,.30);
+    background: rgba(0,0,0,.22);
+    color: #d7c9a8;
+    line-height: 1.5;
+  }
+  .peer-policy-notice strong {
+    color: #f3d28a;
+  }
+  .peer-policy-notice a {
+    color: #f3d28a;
+    font-weight: 700;
+  }
+
+</style>
 </head>
 <body>
 <main>
@@ -142,6 +160,14 @@
     Public masked peer-load view for bcnode.io. This helps identify likely bandwidth/load-heavy Bitcoin peers from traffic,
     ping, and in-flight request data.
   </p>
+
+  <p class="peer-policy-notice">
+    <strong>High-use notice:</strong> bcnode.io is a small public Bitcoin node with limited operator-funded bandwidth.
+    Peers showing repeated extreme latency, unusually high sustained traffic, or repeated in-flight load may be
+    disconnected or temporarily blocked to protect node stability. High-bandwidth users should run their own node
+    or <a href="https://contact.cosigo.io/">request operator review / support</a>.
+  </p>
+
 
   <div class="actions">
     <a href="/">bcnode home</a>
