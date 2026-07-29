@@ -1,0 +1,22 @@
+{
+  "name": "bcnode.io Bitcoin Node",
+  "short_name": "bcnode.io",
+  "description": "Independent COSIGO Bitcoin verification node and public node dashboard.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32 48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}
