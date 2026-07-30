@@ -333,6 +333,90 @@
 }
 /* BCNODE DONATION STYLE END */
 
+
+/* Network bottom layout and COSIGO footer */
+.network-bottom-card {
+  margin-top: 22px;
+}
+
+.cosigo-footer {
+  margin-top: 18px;
+  padding: 20px 0 0;
+  border-top: 1px solid rgba(230, 192, 109, 0.24);
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.cosigo-footer .footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cosigo-footer .footer-info {
+  line-height: 1.55;
+}
+
+.cosigo-footer .github-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(230, 192, 109, 0.34);
+  color: var(--gold2);
+  text-decoration: none;
+  background: rgba(255,255,255,0.05);
+}
+
+.cosigo-footer .github-link:hover,
+.cosigo-footer .github-link:focus {
+  border-color: rgba(247, 147, 26, 0.72);
+  background: rgba(247, 147, 26, 0.12);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* Centered COSIGO network footer */
+.cosigo-footer.centered-cosigo-footer {
+  margin-top: 28px;
+  padding: 24px 0 0;
+  border-top: 1px solid rgba(230, 192, 109, 0.34);
+  color: var(--muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.cosigo-footer.centered-cosigo-footer p {
+  margin: 0 0 10px;
+  line-height: 1.55;
+}
+
+.cosigo-footer.centered-cosigo-footer strong {
+  color: var(--text);
+}
+
+.cosigo-footer.centered-cosigo-footer a {
+  color: var(--gold2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
 </style>
 </head>
 <body>
@@ -395,7 +479,24 @@
         <div class="bar"><div class="fill" id="bandwidthFill"></div></div>
         <div class="sub" id="bandwidthSub">waiting for upload target</div>
       </article>
-<article class="card notice full">
+</section>
+
+    
+<!-- BCNODE DONATION CALLOUT START -->
+<section class="bcnode-donation-callout" aria-label="Support bcnode.io">
+  <div class="bcnode-donation-mark" aria-hidden="true">₿</div>
+  <div>
+    <h2>Keep this node healthy and viable</h2>
+    <p>Donations help keep bcnode.io online, monitored, and useful as independent public Bitcoin verification infrastructure.</p>
+    <div class="bcnode-donation-row">
+      <code class="bcnode-donation-address">bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75</code>
+      <button class="bcnode-copy-btc" type="button" data-bcnode-copy-btc="bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75">copy bitcoin address</button>
+    </div>
+  </div>
+</section>
+<!-- BCNODE DONATION CALLOUT END -->
+
+<article class="card notice full network-bottom-card" id="public-node-bandwidth-policy">
         <div class="label">Public bandwidth policy</div>
         <div class="value">Rate-limited, not unlimited</div>
         <p>
@@ -438,27 +539,22 @@
         </div>
 
       </article>
-    </section>
 
-    
-<!-- BCNODE DONATION CALLOUT START -->
-<section class="bcnode-donation-callout" aria-label="Support bcnode.io">
-  <div class="bcnode-donation-mark" aria-hidden="true">₿</div>
-  <div>
-    <h2>Keep this node healthy and viable</h2>
-    <p>Donations help keep bcnode.io online, monitored, and useful as independent public Bitcoin verification infrastructure.</p>
-    <div class="bcnode-donation-row">
-      <code class="bcnode-donation-address">bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75</code>
-      <button class="bcnode-copy-btc" type="button" data-bcnode-copy-btc="bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75">copy bitcoin address</button>
-    </div>
-  </div>
-</section>
-<!-- BCNODE DONATION CALLOUT END -->
 
-<footer>
-      Updates every 30 seconds from public status data generated locally by the node.
-    </footer>
-  </main>
+<!-- BCNODE NETWORK COSIGO FOOTER START -->
+<footer class="cosigo-footer centered-cosigo-footer">
+<p>
+    <strong>COSIGO&trade; System</strong> — Structure over speculation · Value over price ·
+    Continuity over volatility · Architecture over hype.
+  </p>
+
+  <p>&copy; 2026 COSIGO. All rights reserved.</p>
+  <p>COSIGO&trade; is a trademark of Wendall Gregory Wilson.</p>
+  <p><a href="https://github.com/cosigo" rel="noopener">GitHub</a></p>
+</footer>
+<!-- BCNODE NETWORK COSIGO FOOTER END -->
+
+</main>
 
   <script>
     function fmtNum(n) {
@@ -520,7 +616,7 @@
           "used " + fmtBytes(used) + " / cap " + fmtBytes(target) +
           " · remaining " + fmtBytes(left);
       } else {
-        document.getElementById("bandwidthPct").textContent = "unlimited/unknown";
+        document.getElementById("bandwidthPct").textContent = "rate-limited / unknown";
         document.getElementById("bandwidthSub").textContent = "upload target not available";
       }
 
@@ -584,8 +680,11 @@
       <div class="sub" id="sysUpdated" style="margin-top:10px;">waiting for status.json</div>
     `;
 
+    const bottomPolicy = document.getElementById("public-node-bandwidth-policy");
     const anchor = document.querySelector(".wrap");
-    if (anchor) {
+    if (bottomPolicy && bottomPolicy.parentNode) {
+      bottomPolicy.parentNode.insertBefore(card, bottomPolicy);
+    } else if (anchor) {
       anchor.appendChild(card);
     } else {
       document.body.appendChild(card);
