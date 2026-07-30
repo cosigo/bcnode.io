@@ -738,6 +738,29 @@
 </section>
 <!-- BCNODE DONATION CALLOUT END -->
 
+
+<section class="node-card connect-node-card">
+  <h2>Connect your Bitcoin Core node to bcnode.io</h2>
+  <p>
+    Bitcoin Core users may add bcnode.io as a peer while still using the normal Bitcoin network.
+    This is safer than using <code>connect=</code>, which can restrict a node to selected peers.
+  </p>
+
+  <h3>Temporary connection</h3>
+  <p>Run this from your Bitcoin Core machine. It remains active until Bitcoin Core restarts.</p>
+  <pre><code>bitcoin-cli addnode "bcnode.io:8333" "add"</code></pre>
+
+  <h3>Permanent connection</h3>
+  <p>Add this line to your <code>bitcoin.conf</code> file, then restart Bitcoin Core.</p>
+  <pre><code>addnode=bcnode.io:8333</code></pre>
+
+  <h3>Bitcoin Core GUI</h3>
+  <p>
+    Open Bitcoin Core, go to <strong>Settings → Options → Open Configuration File</strong>,
+    add the <code>addnode=bcnode.io:8333</code> line, save, and restart Bitcoin Core.
+  </p>
+</section>
+
 </main>
 
 <script>
