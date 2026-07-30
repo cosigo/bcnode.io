@@ -365,6 +365,96 @@
 }
 /* BCNODE DONATION STYLE END */
 
+
+/* bcnode Bitcoin peer-connection card */
+.bitcoin-connect-card {
+  max-width: 980px;
+  margin: 2rem auto;
+  padding: clamp(1.1rem, 2.4vw, 1.6rem);
+  border: 1px solid rgba(247, 147, 26, 0.48);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top right, rgba(247, 147, 26, 0.22), transparent 34%),
+    linear-gradient(135deg, rgba(42, 25, 12, 0.96), rgba(18, 13, 10, 0.98));
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 205, 128, 0.16);
+}
+
+.connect-card-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  margin-bottom: .45rem;
+  padding: .28rem .65rem;
+  border: 1px solid rgba(247, 147, 26, 0.45);
+  border-radius: 999px;
+  color: #f7c56a;
+  background: rgba(247, 147, 26, 0.12);
+  font-size: .88rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.connect-command-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.connect-command-panel {
+  border: 1px solid rgba(214, 166, 89, 0.32);
+  border-radius: 14px;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.connect-command-panel h3 {
+  margin-top: 0;
+  color: #f7c56a;
+}
+
+.bitcoin-connect-card pre {
+  overflow-x: auto;
+  padding: .85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(247, 147, 26, 0.28);
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.bitcoin-connect-card code {
+  color: #ffe0a3;
+}
+
+.connect-gui-note {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(247, 147, 26, 0.22);
+}
+
+.cosigo-footer {
+  max-width: 980px;
+  margin: 2rem auto 1rem;
+  padding: 1.25rem;
+  border-top: 1px solid rgba(214, 166, 89, 0.35);
+  color: rgba(255, 238, 210, 0.82);
+  text-align: center;
+  font-size: .92rem;
+}
+
+.cosigo-footer p {
+  margin: .35rem 0;
+}
+
+.cosigo-footer a {
+  color: #f7c56a;
+}
+
+@media (max-width: 760px) {
+  .connect-command-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 </style>
 
   <!-- CIGO trade link metadata -->
@@ -739,27 +829,35 @@
 <!-- BCNODE DONATION CALLOUT END -->
 
 
-<section class="node-card connect-node-card">
-  <h2>Connect your Bitcoin Core node to bcnode.io</h2>
+
+<section class="node-card connect-node-card bitcoin-connect-card" aria-labelledby="connect-bitcoin-core">
+  <div class="connect-card-kicker"><span aria-hidden="true">🔧</span> Bitcoin Core peer setup</div>
+  <h2 id="connect-bitcoin-core">Connect your Bitcoin Core node to bcnode.io</h2>
   <p>
     Bitcoin Core users may add bcnode.io as a peer while still using the normal Bitcoin network.
     This is safer than using <code>connect=</code>, which can restrict a node to selected peers.
   </p>
 
-  <h3>Temporary connection</h3>
-  <p>Run this from your Bitcoin Core machine. It remains active until Bitcoin Core restarts.</p>
-  <pre><code>bitcoin-cli addnode "bcnode.io:8333" "add"</code></pre>
+  <div class="connect-command-grid">
+    <div class="connect-command-panel">
+      <h3>Temporary connection</h3>
+      <p>Run this from your Bitcoin Core machine. It remains active until Bitcoin Core restarts.</p>
+      <pre><code>bitcoin-cli addnode "bcnode.io:8333" "add"</code></pre>
+    </div>
 
-  <h3>Permanent connection</h3>
-  <p>Add this line to your <code>bitcoin.conf</code> file, then restart Bitcoin Core.</p>
-  <pre><code>addnode=bcnode.io:8333</code></pre>
+    <div class="connect-command-panel">
+      <h3>Permanent connection</h3>
+      <p>Add this line to your <code>bitcoin.conf</code> file, then restart Bitcoin Core.</p>
+      <pre><code>addnode=bcnode.io:8333</code></pre>
+    </div>
+  </div>
 
-  <h3>Bitcoin Core GUI</h3>
-  <p>
-    Open Bitcoin Core, go to <strong>Settings → Options → Open Configuration File</strong>,
-    add the <code>addnode=bcnode.io:8333</code> line, save, and restart Bitcoin Core.
+  <p class="connect-gui-note">
+    <strong>Bitcoin Core GUI:</strong>
+    Settings → Options → Open Configuration File. Add <code>addnode=bcnode.io:8333</code>, save, and restart Bitcoin Core.
   </p>
 </section>
+
 
 </main>
 
@@ -908,6 +1006,17 @@ document.addEventListener("click", async function (event) {
 });
 /* BCNODE DONATION COPY END */
 </script>
+
+
+<footer class="cosigo-footer">
+  <p>
+    <strong>COSIGO™ System</strong> — Structure over speculation · Value over price ·
+    Continuity over volatility · Architecture over hype.
+  </p>
+  <p>© 2026 COSIGO. All rights reserved.</p>
+  <p>COSIGO™ is a trademark of Wendall Gregory Wilson.</p>
+  <p><a href="https://github.com/cosigo" rel="noopener">GitHub</a></p>
+</footer>
 
 </body>
 
