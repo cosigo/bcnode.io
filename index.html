@@ -473,6 +473,23 @@
   margin: 0;
 }
 
+
+/* Static label: Bitcoin Core peer setup is informational, not a button */
+.connect-card-kicker {
+  cursor: default;
+  user-select: none;
+  border-color: rgba(247, 147, 26, 0.28) !important;
+  background: rgba(35, 22, 12, 0.46) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.08) !important;
+}
+
+.connect-card-kicker:hover,
+.connect-card-kicker:focus {
+  cursor: default;
+  border-color: rgba(247, 147, 26, 0.28) !important;
+  background: rgba(35, 22, 12, 0.46) !important;
+}
+
 </style>
 
   <!-- CIGO trade link metadata -->
@@ -773,30 +790,7 @@
       </div>
     </section>
 
-    <section class="support-block">
-      <p><strong>Support this node:</strong></p>
-      <p>
-        Contributions help sustain independent Bitcoin verification
-        infrastructure.
-      </p>
-
-      <div class="address-box">
-        <a href="bitcoin:bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75" class="address-link"
-          title="Open in Bitcoin wallet">
-          <code id="donation-btc-address">bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75</code>
-        </a>
-
-        <button type="button" class="copy-btn" id="copy-donation-btc" onclick="copyDonationBTC()">
-          Copy
-        </button>
-      </div>
-
-      <p class="small-note">
-        
-      </p>
-</section>
-
-    <p class="footnote">
+<p class="footnote">
       This interface is public and intended for transparency into
       node status and Bitcoin verification infrastructure.
     </p>
@@ -811,41 +805,6 @@
   <a href="/network.html">open node dashboard</a>
   <a href="/peer-load.html">peer load watch</a>
 </section>
-
-<section class="bcnode-bandwidth-notice" id="public-node-bandwidth">
-  <h2>Public node bandwidth is rate-limited</h2>
-  <p><strong>bcnode.io is operated as independent COSIGO Bitcoin infrastructure.</strong> The node is public, but bandwidth, uptime, monitoring, and maintenance are not free.</p>
-  <p><strong>High-use notice:</strong> bcnode.io welcomes ordinary Bitcoin peer connections. This is a small, independently operated, operator-funded public Bitcoin node. Commercial, indexing, gambling, exchange, analytics, wallet-backend, or other high-volume services should operate their own Bitcoin infrastructure instead of relying on this node. Peer behavior is monitored from local node telemetry such as traffic, latency, connection age, and in-flight request data. Peers showing repeated extreme latency, unusually high sustained traffic, or repeated connection load may be disconnected or temporarily blocked to protect node stability. High-bandwidth users may request operator review / support.</p>
-  <p>Support does not buy consensus influence, transaction priority, private RPC access, or guaranteed uptime.</p>
-
-  <div class="bcnode-bandwidth-meter" aria-label="Bitcoin node bandwidth meter">
-    <div class="bcnode-bandwidth-bar">
-      <div class="bcnode-bandwidth-fill" style="width:0%"></div>
-    </div>
-    <div class="bcnode-bandwidth-small" id="bcnode-bandwidth-text">
-      Current daily upload cap: 5 GiB. Live percentage updates when node bandwidth data is available.
-    </div>
-  </div>
-
-  <a class="bcnode-support-pill" href="https://contact.cosigo.io/">request operator review / support</a>
-</section>
-
-
-<!-- BCNODE DONATION CALLOUT START -->
-<section class="bcnode-donation-callout" aria-label="Support bcnode.io">
-  <div class="bcnode-donation-mark" aria-hidden="true">₿</div>
-  <div>
-    <h2>Keep this node healthy and viable</h2>
-    <p>Donations help keep bcnode.io online, monitored, and useful as independent public Bitcoin verification infrastructure.</p>
-    <div class="bcnode-donation-row">
-      <code class="bcnode-donation-address">bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75</code>
-      <button class="bcnode-copy-btc" type="button" data-bcnode-copy-btc="bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75">copy bitcoin address</button>
-    </div>
-  </div>
-</section>
-<!-- BCNODE DONATION CALLOUT END -->
-
-
 
 <section class="node-card connect-node-card bitcoin-connect-card" aria-labelledby="connect-bitcoin-core">
   <div class="connect-card-kicker"><span aria-hidden="true">🔧</span> Bitcoin Core peer setup</div>
@@ -875,6 +834,37 @@
   </p>
 </section>
 
+<!-- BCNODE DONATION CALLOUT START -->
+<section class="bcnode-donation-callout" aria-label="Support bcnode.io">
+  <div class="bcnode-donation-mark" aria-hidden="true">₿</div>
+  <div>
+    <h2>Support this node — keep it healthy and viable</h2>
+    <p>Contributions help sustain independent Bitcoin verification infrastructure and keep bcnode.io online, monitored, and useful.</p>
+    <div class="bcnode-donation-row">
+      <code class="bcnode-donation-address">bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75</code>
+      <button class="bcnode-copy-btc" type="button" data-bcnode-copy-btc="bc1q27yuzsf2ez5evucm8uhgjetgtnfme7778rsw75">copy bitcoin address</button>
+    </div>
+  </div>
+</section>
+<!-- BCNODE DONATION CALLOUT END -->
+
+<section class="bcnode-bandwidth-notice" id="public-node-bandwidth">
+  <h2>Public node bandwidth is rate-limited</h2>
+  <p><strong>bcnode.io is operated as independent COSIGO Bitcoin infrastructure.</strong> The node is public, but bandwidth, uptime, monitoring, and maintenance are not free.</p>
+  <p><strong>High-use notice:</strong> bcnode.io welcomes ordinary Bitcoin peer connections. This is a small, independently operated, operator-funded public Bitcoin node. Commercial, indexing, gambling, exchange, analytics, wallet-backend, or other high-volume services should operate their own Bitcoin infrastructure instead of relying on this node. Peer behavior is monitored from local node telemetry such as traffic, latency, connection age, and in-flight request data. Peers showing repeated extreme latency, unusually high sustained traffic, or repeated connection load may be disconnected or temporarily blocked to protect node stability. High-bandwidth users may request operator review / support.</p>
+  <p>Support does not buy consensus influence, transaction priority, private RPC access, or guaranteed uptime.</p>
+
+  <div class="bcnode-bandwidth-meter" aria-label="Bitcoin node bandwidth meter">
+    <div class="bcnode-bandwidth-bar">
+      <div class="bcnode-bandwidth-fill" style="width:0%"></div>
+    </div>
+    <div class="bcnode-bandwidth-small" id="bcnode-bandwidth-text">
+      Current daily upload cap: 5 GiB. Live percentage updates when node bandwidth data is available.
+    </div>
+  </div>
+
+  <a class="bcnode-support-pill" href="https://contact.cosigo.io/">request operator review / support</a>
+</section>
 
 </main>
 
