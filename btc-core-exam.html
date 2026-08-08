@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>BTC Core Exam — Bitcoin Core Bootstrap, AssumeUTXO, and BTC Monolith | bcnode.io</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <meta name="description" content="BTC Core Exam is a COSIGO Dev Lab project studying the slow death of ordinary Bitcoin node operation, Bitcoin Core initial sync burden, AssumeUTXO, UTXO snapshot bootstrap, pruning, bandwidth cost, storage cost, heat, and decentralization risk.">
+  <meta name="keywords" content="BTC Monolith, Bitcoin monolith, Bitcoin's monolithic burden, Bitcoin Core bootstrap, Bitcoin node slow sync, Bitcoin Core initial block download, Bitcoin node setup too slow, Bitcoin blockchain too large, AssumeUTXO, loadtxoutset, dumptxoutset, UTXO snapshot, Bitcoin pruned node, Bitcoin node bandwidth, Bitcoin node storage, Bitcoin decentralization risk, ordinary Bitcoin node operators, Bitcoin full node future, bcnode, COSIGO Dev Lab">
+  <meta name="author" content="COSIGO Dev Lab">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://bcnode.io/btc-core-exam.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="bcnode.io">
+  <meta property="og:title" content="BTC Monolith — Bitcoin Core Bootstrap and Node Survival">
+  <meta property="og:description" content="Bitcoin Core initial sync is becoming too costly for ordinary users. BTC Core Exam studies verified UTXO snapshot bootstrap, AssumeUTXO, pruning, and practical node survival.">
+  <meta property="og:url" content="https://bcnode.io/btc-core-exam.html">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="BTC Monolith — Bitcoin Core Bootstrap and Node Survival">
+  <meta name="twitter:description" content="A public COSIGO Dev Lab project studying Bitcoin Core sync burden, AssumeUTXO, UTXO snapshots, pruning, and the future of ordinary Bitcoin node operators.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ResearchProject",
+    "name": "BTC Core Exam — COSIGO Dev Lab",
+    "alternateName": "BTC Monolith",
+    "url": "https://bcnode.io/btc-core-exam.html",
+    "description": "A COSIGO Dev Lab research and proof-of-concept project studying Bitcoin Core bootstrap burden, AssumeUTXO, UTXO snapshot verification, pruning, bandwidth cost, storage cost, heat, and ordinary-user Bitcoin node survival.",
+    "keywords": [
+      "BTC Monolith",
+      "Bitcoin Core bootstrap",
+      "AssumeUTXO",
+      "UTXO snapshot",
+      "Bitcoin node slow sync",
+      "Bitcoin Core initial block download",
+      "Bitcoin pruned node",
+      "Bitcoin decentralization risk",
+      "ordinary Bitcoin node operators"
+    ],
+    "creator": {
+      "@type": "Organization",
+      "name": "COSIGO Dev Lab"
+    },
+    "funder": {
+      "@type": "Organization",
+      "name": "Seed supporters sought"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #070a0f;
+      --panel: #101722;
+      --panel2: #141e2b;
+      --text: #e9eef6;
+      --muted: #aeb9c8;
+      --line: #28364b;
+      --accent: #f7931a;
+      --accent2: #64caff;
+      --ok: #7ee787;
+      --warn: #ffd166;
+      --danger: #ff6b6b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(247,147,26,.20), transparent 34rem),
+        radial-gradient(circle at 90% 3%, rgba(92,200,255,.12), transparent 30rem),
+        linear-gradient(180deg, #070a0f 0%, #0a0f17 45%, #070a0f 100%);
+      color: var(--text);
+      line-height: 1.56;
+    }
+
+    a { color: var(--accent2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+    }
+
+    header {
+      padding: 2.8rem 0 1.7rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: .85rem;
+      margin: 0 0 1.15rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-row img {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      filter: drop-shadow(0 10px 24px rgba(0,0,0,.35));
+    }
+
+    .brand-row .plus {
+      color: var(--muted);
+      font-size: 1.4rem;
+      font-weight: 900;
+      opacity: .85;
+    }
+
+    .brand-row .brand-text {
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      font-size: .82rem;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 800;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      font-size: .82rem;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 6vw, 5.1rem);
+      line-height: .95;
+      margin: .55rem 0 1rem;
+      letter-spacing: -.055em;
+    }
+
+    .lead {
+      font-size: clamp(1.08rem, 2vw, 1.38rem);
+      max-width: 900px;
+      color: var(--muted);
+    }
+
+    .hero-warning {
+      margin-top: 1.25rem;
+      max-width: 920px;
+      border: 1px solid rgba(255,107,107,.38);
+      border-left: 5px solid var(--danger);
+      background: rgba(255,107,107,.07);
+      border-radius: 1rem;
+      padding: 1rem;
+      color: #ffe1e1;
+      font-weight: 650;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      padding: .74rem 1rem;
+      border-radius: .82rem;
+      font-weight: 800;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(247,147,26,.98), rgba(255,190,90,.94));
+      color: #170d00;
+      border-color: rgba(247,147,26,.7);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .card {
+      grid-column: span 12;
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)), var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 1.1rem;
+      padding: 1.1rem;
+      box-shadow: 0 16px 44px rgba(0,0,0,.18);
+    }
+
+    @media (min-width: 820px) {
+      .half { grid-column: span 6; }
+      .third { grid-column: span 4; }
+      .twoThird { grid-column: span 8; }
+    }
+
+    h2 {
+      margin: 0 0 .75rem;
+      font-size: 1.38rem;
+      letter-spacing: -.02em;
+    }
+
+    h3 {
+      margin: 1rem 0 .35rem;
+      color: var(--text);
+    }
+
+    p { margin: .55rem 0; }
+
+    ul, ol { padding-left: 1.2rem; margin: .55rem 0; }
+    li { margin: .32rem 0; }
+
+    .tag {
+      display: inline-block;
+      margin: .2rem .25rem .2rem 0;
+      padding: .25rem .55rem;
+      border-radius: 999px;
+      background: rgba(92,200,255,.09);
+      border: 1px solid rgba(92,200,255,.22);
+      color: #d7f3ff;
+      font-size: .86rem;
+    }
+
+    .warning {
+      border-left: 4px solid var(--warn);
+      padding-left: .85rem;
+      color: var(--muted);
+    }
+
+    .danger {
+      border-left: 4px solid var(--danger);
+      padding-left: .85rem;
+      color: #ffdede;
+    }
+
+    .good {
+      border-left: 4px solid var(--ok);
+      padding-left: .85rem;
+      color: var(--muted);
+    }
+
+    .budget {
+      display: grid;
+      gap: .75rem;
+    }
+
+    .budget-row {
+      border: 1px solid var(--line);
+      background: var(--panel2);
+      border-radius: .9rem;
+      padding: .9rem;
+    }
+
+    .price {
+      color: var(--accent);
+      font-size: 1.25rem;
+      font-weight: 850;
+    }
+
+    code {
+      background: #07101a;
+      border: 1px solid #1f2d40;
+      border-radius: .35rem;
+      padding: .1rem .28rem;
+      color: #d7f3ff;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: .95rem;
+      border-top: 1px solid var(--line);
+      padding-top: 1rem;
+    }
+
+    .source-list {
+      font-size: .92rem;
+      color: var(--muted);
+    }
+
+    .source-list a { word-break: break-word; }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <header>
+      <div class="brand-row" aria-label="BTC Monolith and COSIGO Dev Lab marks">
+        <img src="/assets/btc-monolith-btc.svg" alt="Bitcoin symbol">
+        <span class="plus">×</span>
+        <img src="/assets/cosigo-official-icon.svg" alt="COSIGO icon">
+        <span class="brand-text">BTC Monolith · COSIGO Dev Lab</span>
+      </div>
+      <div class="eyebrow">bcnode.io public research proposal</div>
+      <h1>BTC Monolith</h1>
+      <p class="lead">
+        BTC Core Exam — COSIGO Dev Lab is a two-year public proof-of-concept project
+        studying a growing Bitcoin problem: ordinary node operation is becoming slower,
+        hotter, heavier, and less practical. The project examines Bitcoin Core bootstrap
+        burden, pruning, AssumeUTXO snapshot loading, verification, bandwidth cost,
+        storage cost, heat/load cost, and node survival.
+      </p>
+      <div class="hero-warning">
+        The slow death of ordinary Bitcoin node operation would not happen all at once.
+        It would happen quietly: longer sync times, more heat, more storage, more failed
+        setups, fewer local operators, and more dependence on large infrastructure.
+      </div>
+      <div class="cta-row">
+        <a class="btn primary" href="https://contact.cosigo.io/">Discuss seed support</a>
+        <a class="btn" href="https://bcseek.com/">Follow updates on BCSEEK</a>
+        <a class="btn" href="/network.html">View bcnode dashboard</a>
+        <a class="btn" href="/">Return to bcnode.io</a>
+      </div>
+    </header>
+
+    <section class="grid">
+      <article class="card twoThird">
+        <h2>The problem</h2>
+        <p>
+          Bitcoin verification should remain possible for ordinary people. Yet starting a
+          Bitcoin Core node from scratch can require days or weeks of download, validation,
+          disk writes, heat, bandwidth, and operator patience.
+        </p>
+        <p>
+          If local operators disappear as the blockchain grows, independent verification
+          drifts toward large infrastructure operators: exchanges, custodians, cloud providers,
+          analytics companies, miners, and large holders. That is not healthy for Bitcoin.
+        </p>
+        <p class="warning">
+          This project is based on a simple concern: people who hold meaningful bitcoin should
+          want ordinary node operation to remain practical. Their bitcoins depend on a network
+          that ordinary people can still verify independently.
+        </p>
+      </article>
+
+      <aside class="card third">
+        <h2>Project tags</h2>
+        <span class="tag">BTC Monolith</span>
+        <span class="tag">Bitcoin Core</span>
+        <span class="tag">AssumeUTXO</span>
+        <span class="tag">Pruned nodes</span>
+        <span class="tag">UTXO snapshots</span>
+        <span class="tag">Verification</span>
+        <span class="tag">Bandwidth cost</span>
+        <span class="tag">Node survival</span>
+        <span class="tag">Public lab</span>
+      </aside>
+
+      <article class="card">
+        <h2>An urgent decentralization warning</h2>
+        <p>
+          The slow death of ordinary Bitcoin node operation would not require a protocol
+          collapse. It would only require the ordinary user to give up.
+        </p>
+        <p>
+          More storage, longer initial block download, heavier validation, hotter laptops,
+          bandwidth exhaustion, failed setups, and confusing recovery procedures can slowly
+          push full verification away from local operators and toward large infrastructure.
+        </p>
+        <p class="danger">
+          A Bitcoin network where only large custodians, exchanges, cloud providers, miners,
+          analytics companies, and wealthy operators can comfortably run serious infrastructure
+          is not the same practical decentralization that made Bitcoin important.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>What this project is</h2>
+        <p>
+          BTC Core Exam is a COSIGO development-side research and proof-of-concept project.
+          It studies practical Bitcoin Core operation and whether verified UTXO snapshot
+          bootstrapping can make new nodes usable faster while Bitcoin Core continues to
+          validate history in the background.
+        </p>
+        <p class="good">
+          This project does not change Bitcoin consensus. It does not replace Bitcoin Core
+          validation. It treats snapshot providers as delivery sources, not truth authorities.
+          Bitcoin Core must remain the verifier.
+        </p>
+      </article>
+
+      <article class="card half">
+        <h2>Existing technical foundation</h2>
+        <p>
+          Bitcoin Core already includes the important building blocks:
+        </p>
+        <ul>
+          <li><code>dumptxoutset</code> creates a serialized UTXO snapshot.</li>
+          <li><code>loadtxoutset</code> loads a UTXO snapshot.</li>
+          <li>AssumeUTXO allows a node to become usable from a verified snapshot while historical validation continues.</li>
+          <li>Current Bitcoin Core documentation states there is no canonical source for snapshots.</li>
+        </ul>
+        <p>
+          The missing piece is not merely code. The missing piece is a public, trustworthy,
+          documented distribution and verification model.
+        </p>
+      </article>
+
+      <article class="card half">
+        <h2>Desired final result</h2>
+        <ol>
+          <li>Document normal Bitcoin Core initial-sync cost.</li>
+          <li>Document pruned-node operation and limits.</li>
+          <li>Test AssumeUTXO snapshot bootstrap on clean nodes.</li>
+          <li>Create manifest, checksum, and mirror-verification procedures.</li>
+          <li>Compare multiple independent snapshot sources.</li>
+          <li>Prove bad-file rejection behavior.</li>
+          <li>Measure time, heat, CPU, bandwidth, and disk impact.</li>
+          <li>Publish an operator report for wider review.</li>
+        </ol>
+      </article>
+
+      <article class="card">
+        <h2>Two-year roadmap</h2>
+
+        <h3>Phase 1 — Public project setup and baseline measurements</h3>
+        <p>
+          Build the public project page, define scope, record current bcnode.io operating
+          experience, and measure normal Bitcoin Core startup burden on ordinary hardware.
+        </p>
+
+        <h3>Phase 2 — Snapshot workflow lab</h3>
+        <p>
+          Test Bitcoin Core <code>dumptxoutset</code>, <code>loadtxoutset</code>, pruned-node
+          operation, snapshot loading, and background validation behavior. Produce repeatable
+          commands and logs.
+        </p>
+
+        <h3>Phase 3 — Mirror and verification model</h3>
+        <p>
+          Build a small multi-source distribution test using manifests, checksums, mirrored
+          downloads, and independent operator confirmation. Snapshot sources should be treated
+          as delivery trucks, not authorities.
+        </p>
+
+        <h3>Phase 4 — Public report and review package</h3>
+        <p>
+          Publish test results, cost estimates, failure cases, screenshots, logs, and a practical
+          recommendation package for operators, donors, reviewers, and the wider Bitcoin community.
+        </p>
+      </article>
+
+      <article class="card half">
+        <h2>Support needed</h2>
+        <p>
+          COSIGO can contribute project direction, bcnode.io public-node experience, operator
+          testing, documentation, and part-time coordination. The project requires outside seed
+          support for hardware, storage, bandwidth, independent testing, and development help.
+        </p>
+        <ul>
+          <li>Grants or direct seed support</li>
+          <li>Hardware or storage donation</li>
+          <li>Mirror hosting or bandwidth support</li>
+          <li>Independent node operators willing to reproduce tests</li>
+          <li>Bitcoin Core technical review</li>
+          <li>Documentation and security review assistance</li>
+        </ul>
+      </article>
+
+      <article class="card half">
+        <h2>What support does not buy</h2>
+        <p class="warning">
+          Supporters do not receive equity, token rights, investment returns, control over
+          Bitcoin Core, control over bcnode.io, or authority over project conclusions.
+        </p>
+        <p>
+          This is a research and proof-of-concept effort, not an investment offering. The goal is
+          public documentation and practical operator evidence.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Estimated support tiers</h2>
+        <p>
+          A convincing two-year public Bitcoin Core bootstrap lab cannot be built on poverty-level
+          hobby funding. Hardware, storage, bandwidth, mirrors, independent operators, documentation,
+          security review, legal/admin overhead, and human time all matter.
+        </p>
+        <div class="budget">
+          <div class="budget-row">
+            <div class="price">$25,000–$50,000 — immediate launch grant</div>
+            <p>
+              First 90–120 days: project setup, stronger local test hardware or storage,
+              backup media, basic mirror hosting, baseline Bitcoin Core sync measurements,
+              public documentation, and initial reproducible scripts.
+            </p>
+          </div>
+          <div class="budget-row">
+            <div class="price">$75,000–$150,000 — foundation seed support</div>
+            <p>
+              A serious first-year foundation: producer/test machines, multiple consumer-node
+              tests, storage reserves, bandwidth, monitoring, documentation, operator time,
+              independent reproduction attempts, and public reporting.
+            </p>
+          </div>
+          <div class="budget-row">
+            <div class="price">$250,000–$500,000 — credible two-year lab</div>
+            <p>
+              A complete two-year proof-of-concept: multiple geographic mirrors, independent
+              operators, stronger hardware, failure testing, checksum and manifest tooling,
+              security review, reproducible workflows, public dashboards, and final operator report.
+            </p>
+          </div>
+          <div class="budget-row">
+            <div class="price">$750,000–$1,500,000+ — community-grade initiative</div>
+            <p>
+              Professional-grade effort with dedicated developer/security assistance, sustained
+              hosting and bandwidth, formal test matrix, multiple reviewer cycles, broader public
+              outreach, and a review package suitable for serious Bitcoin community consideration.
+            </p>
+          </div>
+        </div>
+      </article>
+
+
+      <article class="card">
+        <h2>BCSEEK news and dispatch channel</h2>
+        <p>
+          BCSEEK is the public news and dispatch channel for BTC Monolith updates,
+          Bitcoin Core bootstrap burden, ordinary node survival, hardware inflation,
+          bandwidth cost, decentralization risk, and seed-support outreach.
+        </p>
+        <p>
+          The technical proof work belongs here at bcnode.io. The public warning,
+          research dispatches, and support campaign can grow through BCSEEK.
+        </p>
+        <p>
+          <a href="https://bcseek.com/">Follow BCSEEK updates</a>
+        </p>
+      </article>
+
+      <article class="card half">
+        <h2>Why large holders should care</h2>
+        <p>
+          Bitcoin value depends on credible independent verification. If local operators fade
+          away because node startup becomes too costly or frustrating, Bitcoin becomes easier
+          to centralize in practice even if the protocol remains open in theory.
+        </p>
+        <p>
+          Major holders, miners, exchanges, custodians, wallet companies, educators, and public
+          node operators all have a direct interest in making ordinary node operation practical.
+        </p>
+      </article>
+
+      <article class="card half">
+        <h2>Contact and seed support</h2>
+        <p>
+          Seed support, hardware support, mirror participation, review help, or technical
+          discussion can begin through the COSIGO contact page.
+        </p>
+        <p>
+          <strong>Contact page:</strong>
+          <a href="https://contact.cosigo.io/">contact.cosigo.io</a>
+        </p>
+        <p>
+          Please include whether you are offering funding, hardware, hosting, testing, technical
+          review, or general discussion.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Common search concerns this project addresses</h2>
+        <p>
+          This page is intended for people asking the same practical questions many node operators
+          are beginning to ask:
+        </p>
+        <ul>
+          <li>Why does Bitcoin Core take so long to sync?</li>
+          <li>Is the Bitcoin blockchain becoming too large for ordinary users?</li>
+          <li>Will fewer people run Bitcoin nodes in the future?</li>
+          <li>Can Bitcoin Core start faster without trusting one archive provider?</li>
+          <li>How do AssumeUTXO, UTXO snapshots, pruning, and background validation work?</li>
+          <li>Can verified snapshots protect decentralization while reducing setup burden?</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>References</h2>
+        <div class="source-list">
+          <p>
+            Bitcoin Core RPC documentation:
+            <a href="https://bitcoincore.org/en/doc/26.0.0/rpc/blockchain/loadtxoutset/">loadtxoutset</a>,
+            <a href="https://bitcoincore.org/en/doc/30.0.0/rpc/blockchain/dumptxoutset/">dumptxoutset</a>.
+          </p>
+          <p>
+            Bitcoin Core 26.0 release notes describe <code>loadtxoutset</code> as a new RPC for loading
+            UTXO snapshots generated by <code>dumptxoutset</code>.
+          </p>
+          <p>
+            Bitcoin Core 28.0 release notes state that AssumeUTXO mainnet parameters were added for
+            height 840,000.
+          </p>
+          <p>
+            Bitcoin Core AssumeUTXO documentation notes that there is currently no canonical source
+            for snapshots and that downloaded snapshots are checked against hashes hardcoded in source.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <div class="footer">
+      <p>
+        bcnode.io is an independently operated public Bitcoin node project. BTC Core Exam is a
+        COSIGO Dev Lab research proposal and public operator study.
+      </p>
+      <p>
+        Last updated: 2026-08-08.
+      </p>
+    </div>
+  </main>
+</body>
+</html>
