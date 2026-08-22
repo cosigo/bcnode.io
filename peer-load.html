@@ -295,6 +295,14 @@
     <div class="card"><div class="label">Memory pressure</div><div class="value" id="memory-pressure">—</div></div>
   </section>
 
+
+  <!-- bcnode-operator-check-peer-20260822 -->
+  <h2>Operator check peer</h2>
+  <p class="muted">
+    Masked operator-owned home node. Pinned for visibility only; this is not part of the Top peer activity ranking.
+  </p>
+  <div class="table-wrap" id="operator_peer_box">Loading operator peer…</div>
+
   <h2>Top peer activity</h2>
   <div class="table-wrap" id="suspects"></div>
 
@@ -342,6 +350,53 @@
   <p><a href="https://github.com/cosigo" rel="noopener">GitHub</a></p>
 </footer>
 <!-- BCNODE PEER LOAD COSIGO FOOTER END -->
+
+<section class="btc-monolith-crosslink" aria-label="BTC Core Exam project link">
+  <style>
+    .btc-monolith-crosslink {
+      margin: 2rem auto;
+      padding: 1rem;
+      border: 1px solid rgba(247,147,26,.42);
+      border-radius: 1rem;
+      background:
+        linear-gradient(135deg, rgba(247,147,26,.13), rgba(92,200,255,.07)),
+        rgba(12,18,28,.76);
+      color: inherit;
+      max-width: 980px;
+    }
+    .btc-monolith-crosslink strong {
+      display: block;
+      margin-bottom: .25rem;
+      color: #f7931a;
+      font-size: 1.02rem;
+      letter-spacing: .01em;
+    }
+    .btc-monolith-crosslink p {
+      margin: .25rem 0 .85rem;
+      color: inherit;
+      opacity: .88;
+    }
+    .btc-monolith-crosslink a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: .68rem .95rem;
+      border-radius: .8rem;
+      border: 1px solid rgba(247,147,26,.58);
+      background: linear-gradient(135deg, rgba(247,147,26,.98), rgba(255,190,90,.94));
+      color: #170d00;
+      font-weight: 850;
+      text-decoration: none;
+    }
+    .btc-monolith-crosslink a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <strong>BTC Core Exam — COSIGO Dev Lab</strong>
+  <p>The Bitcoin blockchain is becoming a monolithic burden for ordinary node operators. Study the bootstrap, storage, bandwidth, heat, and decentralization problem.</p>
+  <a href="/btc-core-exam.html">BTC Monolith</a>
+</section>
+
 </main>
 
 <script>
@@ -452,6 +507,79 @@ document.addEventListener("click", async function (event) {
   }
 });
 /* BCNODE DONATION COPY END */
+</script>
+
+
+<script id="bcnode-operator-check-peer-script-20260822">
+(function() {
+  const boxId = "operator_peer_box";
+
+  function esc(v) {
+    return String(v ?? "—")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  }
+
+  function fmtBytes(n) {
+    n = Number(n || 0);
+    if (n >= 1073741824) return (n / 1073741824).toFixed(2) + " GB";
+    if (n >= 1048576) return (n / 1048576).toFixed(2) + " MB";
+    if (n >= 1024) return (n / 1024).toFixed(2) + " KB";
+    return n + " B";
+  }
+
+  function renderOperatorPeer(d) {
+    const box = document.getElementById(boxId);
+    if (!box) return;
+
+    const p = d && d.operator_peer ? d.operator_peer : {};
+    const status = p.status || "not connected";
+    const ok = status === "connected";
+
+    box.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>role</th>
+            <th>status</th>
+            <th>masked addr</th>
+            <th>type</th>
+            <th>synced</th>
+            <th>traffic</th>
+            <th>subver</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Operator check peer</td>
+            <td>${ok ? "connected" : "not connected"}</td>
+            <td>${esc(p.addr_masked || "189.141.121.xxx")}</td>
+            <td>${esc(p.connection_type)}</td>
+            <td>${esc(p.synced_blocks)} / ${esc(p.synced_headers)}</td>
+            <td>${fmtBytes(p.bytes_total)} total</td>
+            <td>${esc(p.subver)}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="muted">Pinned by masked address prefix plus <code>bcnode.io</code> user-agent comment. Top peer activity below remains sorted by real traffic.</p>
+    `;
+  }
+
+  async function loadOperatorPeer() {
+    try {
+      const res = await fetch("/operator-peer.json?ts=" + Date.now(), { cache: "no-store" });
+      renderOperatorPeer(await res.json());
+    } catch (e) {
+      const box = document.getElementById(boxId);
+      if (box) box.textContent = "Operator peer status unavailable.";
+    }
+  }
+
+  loadOperatorPeer();
+  setInterval(loadOperatorPeer, 60000);
+})();
 </script>
 
 </body>

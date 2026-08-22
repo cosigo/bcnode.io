@@ -4,3 +4,4 @@ status.json
 *.log
 
 peer-load.json
+operator-peer.json
