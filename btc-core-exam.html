@@ -300,6 +300,30 @@
 
     .source-list a { word-break: break-word; }
   </style>
+
+  <!-- BCNODE COSIGO MASTER LOGO STYLE 20260822 -->
+  <style>
+    .bcnode-title-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      flex-wrap: wrap;
+    }
+    .bcnode-title-logo {
+      width: 2.15rem;
+      height: 2.15rem;
+      object-fit: contain;
+      vertical-align: middle;
+      border-radius: .45rem;
+    }
+    @media (max-width: 640px) {
+      .bcnode-title-logo {
+        width: 1.8rem;
+        height: 1.8rem;
+      }
+    }
+  </style>
+
 </head>
 
 <body>
@@ -312,7 +336,7 @@
         <span class="brand-text">BTC Monolith · COSIGO Dev Lab</span>
       </div>
       <div class="eyebrow">bcnode.io public research proposal</div>
-      <h1>BTC Monolith</h1>
+      <h1><span class="bcnode-title-logo-wrap" data-bcnode-logo="bcnode-title-with-cosigo-logo"><img class="bcnode-title-logo" src="/assets/cosigo_master_512.gif" alt="COSIGO logo" loading="eager"><span>BTC Monolith</span></span></h1>
       <p class="lead">
         BTC Core Exam — COSIGO Dev Lab is a two-year public proof-of-concept project
         studying a growing Bitcoin problem: ordinary node operation is becoming slower,
