@@ -800,10 +800,11 @@
   <h2>Live node dashboard</h2>
   <p>View public Bitcoin node status, bandwidth cap, peers, mempool size, and fee estimates.</p>
   <p class="bcnode-maintenance-note">
-    Availability notice: bcnode.io had temporary VPS-level outages on 2026-08-03 and 2026-08-05. Services recovered after reboot. SSH remains public-key only, fail2ban is actively banning repeat SSH bots, and node stability is under review. Peer capacity and load may be adjusted while VPS/kernel/provider behavior is monitored. If peer slots are full or the node briefly disconnects, please retry later.
+    Availability notice: bcnode.io performs a scheduled recovery backup every Sunday at 02:30 UTC. Bitcoin Core and related node services restart briefly while a consistent recovery archive is created. Existing peer connections disconnect during this maintenance, and peer capacity may remain temporarily reduced while connections rebuild. This scheduled maintenance is separate from the temporary VPS-level outages experienced on 2026-08-03 and 2026-08-05. SSH remains public-key only, fail2ban remains active, and node/provider stability remain under review. If the node is unavailable or peer slots appear limited, please retry later.
   </p>
   <a href="/network.html">open node dashboard</a>
   <a href="/peer-load.html">peer load watch</a>
+  <a href="/btc-core-exam.html">BTC Core Exam</a>
 </section>
 
 <section class="node-card connect-node-card bitcoin-connect-card" aria-labelledby="connect-bitcoin-core">
